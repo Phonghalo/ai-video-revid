@@ -137,14 +137,18 @@ export async function getVideoStatus(id: string): Promise<RevidVideoStatus> {
       throw new Error("REVID_API_KEY is not defined")
     }
 
-    const response = await fetch(`https://www.revid.ai/api/public/v2/status?pid=${id}`, {
+    // Add a cache buster to ensure fresh data
+    const cacheBuster = Date.now()
+    const url = `https://www.revid.ai/api/public/v2/status?pid=${id}&_=${cacheBuster}`
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Cache-Control": "no-cache",
         key: apiKey,
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
       },
     })
-
 
     if (!response.ok) {
       const errorData = await response.json()
@@ -154,7 +158,6 @@ export async function getVideoStatus(id: string): Promise<RevidVideoStatus> {
     const data = await response.json()
     console.log(data)
 
-    // Map the status response to our internal format
     return {
       id: data.pid || id,
       status: mapRevidStatus(data.status),
@@ -167,7 +170,6 @@ export async function getVideoStatus(id: string): Promise<RevidVideoStatus> {
     throw new Error("Failed to get video status from revid.ai")
   }
 }
-
 export async function getProjects(limit = 10): Promise<any[]> {
   try {
     const apiKey = process.env.REVID_API_KEY
