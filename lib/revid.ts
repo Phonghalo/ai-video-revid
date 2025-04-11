@@ -90,7 +90,7 @@ export async function createVideo(options: RevidVideoOptions): Promise<RevidVide
           selectedVoice: options.voice,
           hasEnhancedGeneration: true,
           generationPreset: stylePromptMap[options.style] ||"LEONARDO",
-          generationUserPrompt: "Default style",
+          generationUserPrompt: "You are a meticulous director, based on the script, create videos that closely follow the content. If possible, use videos related to Korea.",
           selectedAudio: "Observer",
           origin: "/create",
           inputText: options.script,

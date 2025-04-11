@@ -14,15 +14,14 @@ Please parse the page at the following URL:
 ${url}
 
 Instructions:
-1. Ignore images, videos, ads, and non-text elements.
-2. If it is a product page:
+1. If it is a product page:
 - Extract: product name, description, use case, ingredients (if any), volume/weight, list price, discount price, membership price, shipping policy, stock status, and seller name.
 - If there are quantity options (1–2–3 units), list the price for each option.
-3. If it is a blog, article, or information page:
+2. If it is a blog, article, or information page:
 - Summarize in 150–200 words.
 - Highlight key points in bullet points if available.
-4. Write clear and professional results in Vietnamese (or English if needed).
-5. Include a source link at the end.
+3. Write clear and professional results in Vietnamese (or English if needed).
+4. Include a source link at the end.
 
 Note:
 - Focus only on meaningful text.
