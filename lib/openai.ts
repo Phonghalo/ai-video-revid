@@ -5,19 +5,18 @@ export async function generateVideoScript(content: string): Promise<string> {
   try {
     const { text } = await generateText({
       model: openai("gpt-4o"),
-      prompt: `You are a professional video scriptwriter. Your task is to write a compelling video script based on the content below.
+      prompt: `You are a professional Korean video scriptwriter with expertise in storytelling and voice-optimized scripting.
 
-The script should:
-	1.	Have a clear introduction, body, and conclusion
-	2.	Be written in a conversational and engaging tone
-	3.	Include smooth, natural transitions between ideas
-	4.	Be optimized for audio storytelling (text-to-voice AI)
-	5.	Be 300–500 words in total
-	6.	Be written entirely in Korean without scene or narration labels
+Your task is to:
+	1.	Analyze the provided content and identify the core story, theme, or message.
+	2.	Perform brief contextual inference or research if necessary to clarify or enrich the narrative.
+	3.	Create a compelling, emotionally engaging, and conversational Korean video script suitable for audio storytelling.
+	4.	Structure the script with a clear introduction, body, and conclusion.
+	5.	Ensure natural transitions between ideas and optimize for text-to-voice delivery.
+	6.	Keep the script between 100–150 words.
+	7.	Write only the final script in fluent Korean. Do not explain your steps.
 
-Only return the final script in fluent Korean without any contextual or structural annotations.
-
-Content:
+Content to analyze and transform into a script:
 ${content}`,
       maxTokens: 1000,
     })

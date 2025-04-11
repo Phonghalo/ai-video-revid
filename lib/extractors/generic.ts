@@ -1,27 +1,38 @@
+import {generateText} from "ai";
+import {openai} from "@ai-sdk/openai";
+
 export async function extractFromGenericUrl(url: string): Promise<string> {
   try {
     // In a real implementation, you would use a web scraping library or API
     // to extract the content from a generic URL
+    const { text } = await generateText({
+      model: openai("gpt-4o"),
+      prompt: `You are an AI assistant that extracts and summarizes **text content** from any web page.
+
+Please parse the page at the following URL:
+
+${url}
+
+Instructions:
+1. Ignore images, videos, ads, and non-text elements.
+2. If it is a product page:
+- Extract: product name, description, use case, ingredients (if any), volume/weight, list price, discount price, membership price, shipping policy, stock status, and seller name.
+- If there are quantity options (1–2–3 units), list the price for each option.
+3. If it is a blog, article, or information page:
+- Summarize in 150–200 words.
+- Highlight key points in bullet points if available.
+4. Write clear and professional results in Vietnamese (or English if needed).
+5. Include a source link at the end.
+
+Note:
+- Focus only on meaningful text.
+- If the page is inaccessible, return general information`,
+      maxTokens: 1000,
+    })
+    console.log(text)
+    return text
 
     // For demonstration purposes, we'll use a simple fetch
-    const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`)
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch content from URL")
-    }
-
-    const html = await response.text()
-
-    // Extract text content from HTML (very simplified)
-    // In a real implementation, you would use a proper HTML parser
-    const textContent = html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-      .replace(/<[^>]*>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-
-    return textContent.substring(0, 5000) + (textContent.length > 5000 ? "..." : "")
   } catch (error) {
     console.error("Error extracting from generic URL:", error)
     throw new Error("Failed to extract content from URL")

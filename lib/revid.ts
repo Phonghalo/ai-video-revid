@@ -86,6 +86,7 @@ export async function createVideo(options: RevidVideoOptions): Promise<RevidVide
         creationParams: {
           mediaType: "stockVideo",
           captionPresetName: "Wrap 1",
+          captionPositionName: 'bottom',
           selectedVoice: options.voice,
           hasEnhancedGeneration: true,
           generationPreset: stylePromptMap[options.style] ||"LEONARDO",
