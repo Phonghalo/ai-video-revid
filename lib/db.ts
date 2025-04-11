@@ -131,16 +131,12 @@ export async function getAllProjects() {
 export async function createVideo(data: Omit<Video, "id" | "createdAt" | "updatedAt" | "progress">) {
   const supabase = createServerSupabaseClient()
 
-  // For revid.ai videos, we might already have an ID
-  const hasCustomId = !!data.id
-
   const insertData = {
     project_id: data.projectId,
     title: data.title,
     status: data.status || "pending",
     progress: 0,
     webhook_id: data.webhookId,
-    ...(hasCustomId && { id: data.id }), // Only include ID if provided
   }
 
   const { data: video, error } = await supabase.from("videos").insert(insertData).select().single()

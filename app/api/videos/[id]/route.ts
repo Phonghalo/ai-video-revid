@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
           id: revidStatus.id,
           projectId: "unknown", // This will be updated when we get more info
           title: "Video from revid.ai",
-          status: revidStatus.status,
+          status: revidStatus.status as  "pending" | "building" | "ready" | "failed"  ,
           progress: revidStatus.progress,
           url: revidStatus.url,
           error: revidStatus.error,
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         const status = await getVideoStatus(video.id)
         // Update our record with the latest status
         const updatedVideo = await updateVideo(video.id, {
-          status: status.status,
+          status: status.status as  "pending" | "building" | "ready" | "failed" | undefined,
           progress: status.progress,
           url: status.url,
           error: status.error,
