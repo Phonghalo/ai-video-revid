@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/use-toast"
 
 interface VideoStatus {
   id: string
-  status: "pending" | "processing" | "completed" | "failed"
+  status: "pending" | "building" | "ready" | "failed"
   progress: number
   url?: string
   error?: string
@@ -43,7 +43,7 @@ export default function VideoStatusPage() {
       const data = await response.json()
       setVideoStatus(data)
 
-      if (data.status === "completed" || data.status === "failed") {
+      if (data.status === "ready" || data.status === "failed") {
         if (pollingRef.current) {
           clearInterval(pollingRef.current)
           pollingRef.current = null
@@ -120,13 +120,13 @@ export default function VideoStatusPage() {
           <CardTitle>{videoStatus?.title || "Video Creation"}</CardTitle>
           <CardDescription>
             {videoStatus?.status === "pending" && "Your video is in the queue..."}
-            {videoStatus?.status === "processing" && "Your video is being created..."}
-            {videoStatus?.status === "completed" && "Your video is ready!"}
+            {videoStatus?.status === "building" && "Your video is being created..."}
+            {videoStatus?.status === "ready" && "Your video is ready!"}
             {videoStatus?.status === "failed" && "Video creation failed"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {(videoStatus?.status === "pending" || videoStatus?.status === "processing") && (
+          {(videoStatus?.status === "pending" || videoStatus?.status === "building") && (
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Progress</span>
@@ -136,7 +136,7 @@ export default function VideoStatusPage() {
             </div>
           )}
 
-          {videoStatus?.status === "completed" && videoStatus.url && (
+          {videoStatus?.status === "ready" && videoStatus.url && (
             <div className="aspect-video">
               <video
                 src={videoStatus.url}
@@ -165,13 +165,13 @@ export default function VideoStatusPage() {
           <Button
             variant="outline"
             onClick={handleRefresh}
-            disabled={isRefreshing || videoStatus?.status === "completed"}
+            disabled={isRefreshing || videoStatus?.status === "ready"}
           >
             {isRefreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             <span className="ml-2">Refresh Status</span>
           </Button>
 
-          {videoStatus?.status === "completed" && videoStatus.url && (
+          {videoStatus?.status === "ready" && videoStatus.url && (
             <Button onClick={handleDownload}>
               <Download className="mr-2 h-4 w-4" />
               Download Video

@@ -9,9 +9,6 @@ export async function GET(request: NextRequest) {
 
 		const response = await fetch("https://www.revid.ai/api/voice/getVoices", {
 			method: "GET",
-			headers: {
-				Authorization: `Bearer ${apiKey}`,
-			},
 		})
 
 		if (!response.ok) {

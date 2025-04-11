@@ -15,7 +15,7 @@ export async function POST(request: NextRequest, { params }: { params: { webhook
     console.log("Webhook data received:", data)
 
     // Map the webhook data to our internal format
-    const status = data.status ? mapRevidStatus(data.status) : "processing"
+    const status = data.status ? mapRevidStatus(data.status) : "building"
     const progress = calculateProgress(data)
     const url = data.videoUrl || data.url
     const error = data.error
@@ -37,21 +37,21 @@ export async function POST(request: NextRequest, { params }: { params: { webhook
 }
 
 // Helper function to map revid.ai status to our internal status
-function mapRevidStatus(revidStatus: string): "pending" | "processing" | "completed" | "failed" {
-  const statusMap: Record<string, "pending" | "processing" | "completed" | "failed"> = {
+function mapRevidStatus(revidStatus: string): "pending" | "building" | "ready" | "failed" {
+  const statusMap: Record<string, "pending" | "building" | "ready" | "failed"> = {
     pending: "pending",
-    processing: "processing",
-    in_progress: "processing",
-    generating: "processing",
-    rendering: "processing",
-    completed: "completed",
-    done: "completed",
-    ready: "completed",
+    processing: "building",
+    in_progress: "building",
+    generating: "building",
+    rendering: "building",
+    completed: "ready",
+    done: "ready",
+    ready: "ready",
     failed: "failed",
     error: "failed",
   }
 
-  return statusMap[revidStatus.toLowerCase()] || "processing"
+  return statusMap[revidStatus.toLowerCase()] || "building"
 }
 
 // Helper function to calculate progress percentage based on revid.ai status
@@ -70,7 +70,7 @@ function calculateProgress(data: any): number {
     return 30
   } else if (status.includes("rendering")) {
     return 70
-  } else if (status.includes("completed") || status.includes("done") || status.includes("ready")) {
+  } else if (status.includes("ready") || status.includes("done") || status.includes("ready")) {
     return 100
   } else if (status.includes("failed") || status.includes("error")) {
     return 0

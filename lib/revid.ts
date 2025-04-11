@@ -138,19 +138,21 @@ export async function getVideoStatus(id: string): Promise<RevidVideoStatus> {
     }
 
     const response = await fetch(`https://www.revid.ai/api/public/v2/status?pid=${id}`, {
-      method: "POST", // Note: Using POST as per the curl example, even though it's a status check
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        "Cache-Control": "no-cache",
+        key: apiKey,
       },
     })
-    console.log( await response.json())
+
+
     if (!response.ok) {
       const errorData = await response.json()
       throw new Error(errorData.message || "Failed to get video status")
     }
 
     const data = await response.json()
+    console.log(data)
 
     // Map the status response to our internal format
     return {
@@ -158,7 +160,7 @@ export async function getVideoStatus(id: string): Promise<RevidVideoStatus> {
       status: mapRevidStatus(data.status),
       progress: calculateProgress(data),
       url: data.videoUrl || data.url,
-      error: data.error,
+      error: data?.error,
     }
   } catch (error) {
     console.error("Error getting video status from revid.ai:", error)
@@ -177,7 +179,7 @@ export async function getProjects(limit = 10): Promise<any[]> {
       method: "POST", // Note: Using POST as per the curl example
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        key: apiKey,
       },
     })
 
@@ -194,77 +196,23 @@ export async function getProjects(limit = 10): Promise<any[]> {
   }
 }
 
-export async function addToQueue(options: {
-  videoUrl: string
-  title: string
-  channelName?: string
-}): Promise<any> {
-  try {
-    const apiKey = process.env.REVID_API_KEY
-    if (!apiKey) {
-      throw new Error("REVID_API_KEY is not defined")
-    }
-
-    const response = await fetch("https://www.revid.ai/api/public/v2/add-to-queue", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        videoUrl: options.videoUrl,
-        channelName: options.channelName || "default-channel",
-        tiktok: {
-          username: "revid",
-          title: options.title,
-          privacy_level: "PUBLIC_TO_EVERYONE",
-          disable_duet: false,
-          disable_stitch: false,
-          disable_comment: false,
-          brand_organic_toggle: false,
-          brand_content_toggle: false,
-          discloseContent: false,
-        },
-        youtube: {
-          username: "revid",
-          title: options.title,
-          description: options.title,
-        },
-        instagram: {
-          username: "revid",
-          title: options.title,
-        },
-      }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || "Failed to add to queue")
-    }
-
-    return await response.json()
-  } catch (error) {
-    console.error("Error adding to queue with revid.ai:", error)
-    throw new Error("Failed to add to queue with revid.ai")
-  }
-}
-
 // Helper function to map revid.ai status to our internal status
-function mapRevidStatus(revidStatus: string): "pending" | "processing" | "completed" | "failed" {
-  const statusMap: Record<string, "pending" | "processing" | "completed" | "failed"> = {
+function mapRevidStatus(revidStatus: string): "pending" | "building" | "ready" | "failed" {
+  const statusMap: Record<string, "pending" | "building" | "ready" | "failed"> = {
     pending: "pending",
-    processing: "processing",
-    in_progress: "processing",
-    generating: "processing",
-    rendering: "processing",
-    completed: "completed",
-    done: "completed",
-    ready: "completed",
+    processing: "building",
+    in_progress: "building",
+    generating: "building",
+    building: "building",
+    rendering: "building",
+    completed: "ready",
+    done: "ready",
+    ready: "ready",
     failed: "failed",
     error: "failed",
   }
 
-  return statusMap[revidStatus.toLowerCase()] || "processing"
+  return statusMap[revidStatus.toLowerCase()] || "building"
 }
 
 // Helper function to calculate progress percentage based on revid.ai status
@@ -283,7 +231,8 @@ function calculateProgress(data: any): number {
     return 30
   } else if (status.includes("rendering")) {
     return 70
-  } else if (status.includes("completed") || status.includes("done") || status.includes("ready")) {
+  } else if (status.includes("" +
+    "ready") || status.includes("done") || status.includes("ready")) {
     return 100
   } else if (status.includes("failed") || status.includes("error")) {
     return 0

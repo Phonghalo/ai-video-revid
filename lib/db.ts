@@ -5,7 +5,7 @@ export interface Project {
   title: string
   originalContent: string
   script: string
-  status: "draft" | "pending" | "processing" | "completed" | "failed"
+  status: "draft" | "pending" | "building" | "ready" | "failed"
   createdAt: string
   updatedAt: string
   videoId?: string
@@ -15,7 +15,7 @@ export interface Video {
   id: string
   projectId: string
   title: string
-  status: "pending" | "processing" | "completed" | "failed"
+  status: "pending" | "building" | "ready" | "failed"
   progress: number
   url?: string
   error?: string
@@ -195,12 +195,12 @@ export async function updateVideo(id: string, data: Partial<Omit<Video, "id" | "
   }
 
   // Update the associated project if status changes
-  if (data.status && ["completed", "failed"].includes(data.status)) {
+  if (data.status && ["ready", "failed"].includes(data.status)) {
     const { data: projectData } = await supabase.from("videos").select("project_id").eq("id", id).single()
 
     if (projectData) {
       await updateProject(projectData.project_id, {
-        status: data.status as "completed" | "failed",
+        status: data.status as "ready" | "failed",
       })
     }
   }

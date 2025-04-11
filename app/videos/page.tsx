@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/use-toast"
 interface VideoProject {
   id: string
   title: string
-  status: "draft" | "pending" | "processing" | "completed" | "failed"
+  status: "draft" | "pending" | "building" | "ready" | "failed"
   createdAt: string
   videoId?: string
 }
@@ -93,11 +93,11 @@ export default function VideosPage() {
                 <div className="flex items-center space-x-2">
                   <div
                     className={`w-3 h-3 rounded-full ${
-                      video.status === "completed"
+                      video.status === "ready"
                         ? "bg-green-500"
                         : video.status === "failed"
                           ? "bg-red-500"
-                          : video.status === "processing" || video.status === "pending"
+                          : video.status === "building" || video.status === "pending"
                             ? "bg-yellow-500"
                             : "bg-gray-500"
                     }`}
@@ -115,7 +115,7 @@ export default function VideosPage() {
                   </Link>
                 )}
 
-                {(video.status === "pending" || video.status === "processing") && video.videoId && (
+                {(video.status === "pending" || video.status === "building") && video.videoId && (
                   <Link href={`/video-status?id=${video.videoId}`} className="w-full">
                     <Button variant="outline" className="w-full">
                       View Progress
@@ -124,7 +124,7 @@ export default function VideosPage() {
                   </Link>
                 )}
 
-                {video.status === "completed" && video.videoId && (
+                {video.status === "ready" && video.videoId && (
                   <Link href={`/video-status?id=${video.videoId}`} className="w-full">
                     <Button className="w-full">
                       Watch Video

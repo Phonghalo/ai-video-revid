@@ -9,7 +9,7 @@ export interface Database {
           title: string
           original_content: string
           script: string
-          status: "draft" | "pending" | "processing" | "completed" | "failed"
+          status: "draft" | "pending" | "building" | "ready" | "failed"
           created_at: string
           updated_at: string
           video_id: string | null
@@ -19,7 +19,7 @@ export interface Database {
           title: string
           original_content: string
           script: string
-          status?: "draft" | "pending" | "processing" | "completed" | "failed"
+          status?: "draft" | "pending" | "building" | "ready" | "failed"
           created_at?: string
           updated_at?: string
           video_id?: string | null
@@ -29,7 +29,7 @@ export interface Database {
           title?: string
           original_content?: string
           script?: string
-          status?: "draft" | "pending" | "processing" | "completed" | "failed"
+          status?: "draft" | "pending" | "building" | "ready" | "failed"
           created_at?: string
           updated_at?: string
           video_id?: string | null
@@ -40,7 +40,7 @@ export interface Database {
           id: string
           project_id: string
           title: string
-          status: "pending" | "processing" | "completed" | "failed"
+          status: "pending" | "building" | "ready" | "failed"
           progress: number
           url: string | null
           error: string | null
@@ -52,7 +52,7 @@ export interface Database {
           id?: string
           project_id: string
           title: string
-          status?: "pending" | "processing" | "completed" | "failed"
+          status?: "pending" | "building" | "ready" | "failed"
           progress?: number
           url?: string | null
           error?: string | null
@@ -64,7 +64,7 @@ export interface Database {
           id?: string
           project_id?: string
           title?: string
-          status?: "pending" | "processing" | "completed" | "failed"
+          status?: "pending" | "building" | "ready" | "failed"
           progress?: number
           url?: string | null
           error?: string | null

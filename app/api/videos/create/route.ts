@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getProject, updateVideo } from "@/lib/db"
+import { getProject } from "@/lib/db"
 import { createVideo as createRevidVideo } from "@/lib/revid"
-import { createVideo as createVideoRecord } from "@/lib/db"
+import { createOrUpdateVideo } from "@/lib/db"
 
 export const maxDuration = 60 // Set max duration to 60 seconds
 
@@ -37,17 +37,14 @@ export async function POST(request: NextRequest) {
       webhookUrl,
     })
 
-    // Create a record in our database
-    const video = await createVideoRecord({
+    // Create a record in our database with the revid.ai ID
+    await createOrUpdateVideo({
+      id: revidResponse.id,
       projectId,
       title: settings.title,
       status: "pending",
+      progress: 0,
       webhookId,
-    })
-
-    // Update the video record with the revid.ai ID
-    await updateVideo(video.id, {
-      id: revidResponse.id,
     })
 
     return NextResponse.json({ videoId: revidResponse.id })
