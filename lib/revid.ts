@@ -218,28 +218,37 @@ function mapRevidStatus(revidStatus: string): "pending" | "building" | "ready" |
 }
 
 // Helper function to calculate progress percentage based on revid.ai status
+// Memory cache để lưu progress tạm thời (chỉ hiệu quả nếu app không bị restart)
+const progressCache: Record<string, number> = {};
+
 function calculateProgress(data: any): number {
-  // If progress is explicitly provided, use it
-  if (typeof data.progress === "number") {
-    return data.progress
+  const status = (data.status || "").toLowerCase();
+  const id = data.pid || data.id;
+
+  // Nếu status là ready thì gán 100%
+  if (["completed", "done", "ready"].includes(status)) {
+    progressCache[id] = 100;
+    return 100;
   }
 
-  // Otherwise, estimate based on status
-  const status = (data.status || "").toLowerCase()
-
-  if (status.includes("pending") || status.includes("queued")) {
-    return 10
-  } else if (status.includes("generating")) {
-    return 30
-  } else if (status.includes("rendering")) {
-    return 70
-  } else if (status.includes("" +
-    "ready") || status.includes("done") || status.includes("ready")) {
-    return 100
-  } else if (status.includes("failed") || status.includes("error")) {
-    return 0
+  // Nếu failed thì gán 0%
+  if (["failed", "error"].includes(status)) {
+    progressCache[id] = 0;
+    return 0;
   }
 
-  // Default to 50% if we can't determine
-  return 50
+  // Nếu đã có cache thì tăng ngẫu nhiên 1–5 đơn vị (tối đa 99)
+  if (progressCache[id] !== undefined) {
+    const increment = Math.floor(Math.random() * 5) + 1;
+    progressCache[id] = Math.min(progressCache[id] + increment, 99);
+    return progressCache[id];
+  }
+
+  // Nếu chưa có cache, khởi tạo ở 10 hoặc theo status ước lượng
+  let initial = 10;
+  if (status.includes("generating")) initial = 30;
+  else if (status.includes("rendering")) initial = 70;
+
+  progressCache[id] = initial;
+  return initial;
 }
